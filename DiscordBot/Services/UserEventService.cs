@@ -38,28 +38,41 @@ namespace DiscordBot.Services
         }
 
         private Task MessageReceivedAsync(SocketMessage msg)
-        {
-            var mentionedUser = msg.MentionedUsers.FirstOrDefault();
-            var author = msg.Author;
-            if (msg.Channel.Id == 826709742332280862
-                && msg.Content.StartsWith('<')
-                && !msg.Content.Contains("everyone"))
+        {            
+            if (msg.Channel.Id == 826709742332280862)
             {
-                if (author.Id != mentionedUser.Id && !mentionedUser.IsBot)
+                if (msg.Content.StartsWith('<') && !msg.Content.Contains("everyone")) 
                 {
-                    _userLeagueVouchService.AddOrUpdateUserLeagueVouchAsync(msg.Author.Id,
-                                                                        "Ritual",
-                                                                        msg.MentionedUsers.FirstOrDefault().Id,
-                                                                        msg.Content);
+                    var mentionedUser = msg.MentionedUsers.FirstOrDefault();
+                    var author = msg.Author;
+
+                    if (author.Id != mentionedUser.Id && !mentionedUser.IsBot)
+                    {
+                        _userLeagueVouchService.AddOrUpdateUserLeagueVouchAsync(msg.Author.Id,
+                                                                            "Ritual",
+                                                                            msg.MentionedUsers.FirstOrDefault().Id,
+                                                                            msg.Content);
+                    }
+                    else
+                    {
+                        _discord.GetGuild(753991000715690085)
+                                .GetTextChannel(826709742332280862)
+                                .SendMessageAsync("Tính tự vote cho chính mình ? Hãy quên ý định đó đi =))\nBtw, cũng đừng vote cho bot");
+                    }
+
                 }
                 else
                 {
-                    _discord.GetGuild(753991000715690085)
-                            .GetTextChannel(826709742332280862)
-                            .SendMessageAsync("Tính tự vote cho chính mình ? Hãy quên ý định đó đi =))\nBtw, cũng đừng vote cho bot");
+                    if (!msg.Author.IsBot)
+                    {
+                        _discord.GetGuild(753991000715690085)
+                                .GetTextChannel(826709742332280862)
+                                .SendMessageAsync("Không spam ở đây");
+                        msg.DeleteAsync();
+                    }
                 }
-                
             }
+                
 
             return Task.CompletedTask;
         }

@@ -24,5 +24,8 @@ namespace Repositories
         public async Task<UserLeagueVouch> UserLeagueVouchAsync(ulong userId, Guid leagueId, bool trackChanges)
             => await FindByCondition(x => x.UserId == userId && x.LeagueId == leagueId,
                                      trackChanges).SingleOrDefaultAsync();
+
+        public async Task<List<UserLeagueVouch>> GetUserVouchesAsync(ulong userId, bool trackChanges)
+            => await FindByCondition(x => x.UserId == userId, trackChanges).ToListAsync();
     }
 }

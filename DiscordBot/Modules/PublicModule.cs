@@ -2,6 +2,7 @@
 using Discord.Commands;
 using Discord.WebSocket;
 using Repositories.Interfaces;
+using Services.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,10 +13,12 @@ namespace DiscordBot.Modules
     public class PublicModule : ModuleBase<SocketCommandContext>
     {
         private readonly CommandService _commandService;
+        private readonly IUserInformationService _userInformationService;
 
-        public PublicModule(CommandService commandService)
+        public PublicModule(CommandService commandService, IUserInformationService userInformationService)
         {
             _commandService = commandService;
+            _userInformationService = userInformationService;
         }
 
         [Command("help")]
@@ -45,6 +48,7 @@ namespace DiscordBot.Modules
         public async Task UserInfoAsync(IUser user = null)
         {
             user ??= Context.User;
+            var userVouchInfo = await _userInformationService.GetUserInformationAsync(user.Id);
             var roles = (user as SocketGuildUser).Roles.ToList();
             string role;
             if (roles[0].Name.Contains("everyone") && roles.Count == 1) role = "Newbie";
@@ -52,8 +56,12 @@ namespace DiscordBot.Modules
             EmbedBuilder embedBuilder = new();
             embedBuilder.AddField(user.Username, user.Status);
             embedBuilder.AddField("Acc đã tạo được ", (DateTime.Now.Date - user.CreatedAt.Date).ToString("dd") + " ngày");
+            embedBuilder.AddField("Đã tham gia vào group được", userVouchInfo.Joined + " ngày");
             embedBuilder.AddField("Hiện đang", user.Activity is null ? "Không làm gì cả" : user.Activity);
             embedBuilder.AddField("Cấp độ", role);
+            embedBuilder.AddField("Tổng lượt vouch", userVouchInfo.TotalVouch);
+            embedBuilder.AddField("Unique vouch trong league Ritual", userVouchInfo.UniqueVouch);
+            embedBuilder.AddField("Tổng unique vouch", userVouchInfo.LeagueUniqueVouch);
             await ReplyAsync("", false, embedBuilder.Build());
         }
 

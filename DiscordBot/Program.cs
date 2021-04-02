@@ -45,28 +45,23 @@ namespace DiscordBot
         }
 
         private ServiceProvider ConfigureServices()
-            => new ServiceCollection().AddDbContext<DataContext>(options=> 
-            {
-                options.UseLoggerFactory(LoggerFactory.Create(builder =>
-                {
-                    builder.AddConsole();
-                    builder.AddFilter("Microsoft.EntityFrameworkCore", LogLevel.Information);
-                }));
-            }).AddSingleton<DiscordSocketClient>()
-              .AddSingleton<CommandService>()
-              .AddSingleton<CommandHandlingService>()
-              .AddSingleton<UserEventService>()
-              .AddSingleton<AutoSendMessageService>()
-              .AddSingleton<HttpClient>()
-              .AddSingleton<IRepositoryManager, RepositoryManager>()
-              .AddSingleton(typeof(IRepositoryBase<>), typeof(RepositoryBase<>))
-              .AddSingleton<ILeagueRepository, LeagueRepository>()
-              .AddSingleton<IUserRepository, UserRepository>()
-              .AddSingleton<IUserLeagueVouchRepository, UserLeagueVouchRepository>()
-              .AddSingleton<IVouchUserRepository, VouchUserRepository>()
-              .AddSingleton<IUserService, UserService>()
-              .AddSingleton<IUserLeagueVouchService, UserLeagueVouchService>()
-              .BuildServiceProvider();
+            => new ServiceCollection().AddDbContext<DataContext>()
+                                      .AddSingleton<DiscordSocketClient>()
+                                      .AddSingleton<CommandService>()
+                                      .AddSingleton<CommandHandlingService>()
+                                      .AddSingleton<UserEventService>()
+                                      .AddSingleton<AutoSendMessageService>()
+                                      .AddSingleton<HttpClient>()
+                                      .AddSingleton<IRepositoryManager, RepositoryManager>()
+                                      .AddSingleton(typeof(IRepositoryBase<>), typeof(RepositoryBase<>))
+                                      .AddSingleton<ILeagueRepository, LeagueRepository>()
+                                      .AddSingleton<IUserRepository, UserRepository>()
+                                      .AddSingleton<IUserLeagueVouchRepository, UserLeagueVouchRepository>()
+                                      .AddSingleton<IVouchUserRepository, VouchUserRepository>()
+                                      .AddSingleton<IUserService, UserService>()
+                                      .AddSingleton<IUserLeagueVouchService, UserLeagueVouchService>()
+                                      .AddSingleton<IUserInformationService, UserInformationService>()
+                                      .BuildServiceProvider();
 
         private Task LogAsync(LogMessage log)
         {

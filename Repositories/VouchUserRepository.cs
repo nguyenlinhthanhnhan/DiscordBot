@@ -23,9 +23,7 @@ namespace Repositories
             => await FindByCondition(x => x.UserLeagueVouchUserId == userId && x.UserLeagueVouchLeagueId == leagueId,
                                      trackChanges).ToListAsync();
 
-        public Task<List<VouchUser>> GetListVouchedByAUserAsync(ulong userId, bool trackChanges)
-        {
-            throw new NotImplementedException();
-        }
+        public async Task<List<VouchUser>> GetListVouchedByAUserAsync(ulong userId, bool trackChanges)
+            => await FindByCondition(x => x.UserVouchId == userId, trackChanges).ToListAsync();
     }
 }

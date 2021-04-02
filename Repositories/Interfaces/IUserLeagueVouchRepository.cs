@@ -13,5 +13,6 @@ namespace Repositories.Interfaces
         Task<UserLeagueVouch> UserLeagueVouchAsync(ulong userId, Guid leagueId, bool trackChanges);
         void CreateUserLeagueVouch(UserLeagueVouch userLeagueVouch);
         void DeleteUserLeagueVouch(UserLeagueVouch userLeagueVouch);
+        Task<List<UserLeagueVouch>> GetUserVouchesAsync(ulong userId, bool trackChanges);
     }
 }
