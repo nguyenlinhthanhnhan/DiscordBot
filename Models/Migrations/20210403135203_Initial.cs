@@ -27,7 +27,8 @@ namespace Models.Migrations
                     Id = table.Column<ulong>(type: "bigint unsigned", nullable: false)
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     JoinedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
-                    TotalVouch = table.Column<uint>(type: "int unsigned", nullable: false)
+                    TotalVouch = table.Column<uint>(type: "int unsigned", nullable: false),
+                    TotalUniqueVouch = table.Column<uint>(type: "int unsigned", nullable: false)
                 },
                 constraints: table =>
                 {

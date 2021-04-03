@@ -9,7 +9,7 @@ namespace Services.Interfaces
 {
     public interface IUserLeagueVouchService:IUserLeagueVouchRepository
     {
-        Task AddOrUpdateUserLeagueVouchAsync(ulong userId, string leagueName, ulong userVote, string reason);
+        Task<Tuple<bool, uint>> AddOrUpdateUserLeagueVouchAsync(ulong userId, string leagueName, ulong userVote, string reason);
         Task SaveAsync();
     }
 }

@@ -2,6 +2,7 @@
 using Discord.Commands;
 using Discord.WebSocket;
 using Repositories.Interfaces;
+using Services.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,11 +16,13 @@ namespace DiscordBot.Modules
     {
         private readonly ILeagueRepository _leagueRepository;
         private readonly CommandService _commandService;
+        private readonly IUserService _userService;
 
-        public DeveloperModule(ILeagueRepository leagueRepository, CommandService commandService)
+        public DeveloperModule(ILeagueRepository leagueRepository, CommandService commandService, IUserService userService)
         {
             _leagueRepository = leagueRepository;
             _commandService = commandService;
+            _userService = userService;
         }
 
         [Command("!!dev")]
@@ -40,8 +43,8 @@ namespace DiscordBot.Modules
             }
             await ReplyAsync("", false, embedBuilder.Build());
         }
-        [Command("halo")]
-        public async Task HaloAsync() => await ReplyAsync("Hello my God");
+        [Command("helo")]
+        public async Task HaloAsync() => await ReplyAsync("Hawk vĩ đại anh minh thần võ, thiên thu vạn tái nhất thống giang hồ");
 
         // Get user permission
         [Command("!!permission")]
@@ -75,6 +78,23 @@ namespace DiscordBot.Modules
             {
                 _leagueRepository.CreateLeague(new Models.League {LeagueName = league });
                 await ReplyAsync($"Đã tạo thêm league {league} vào cơ sở dữ liệu");
+            }
+        }
+
+        [Command("!!addUniqueVouch")]
+        [Summary("Thêm unique vouch cho user")]
+        public async Task AddUniqueVouchAsync(IUser user = null, uint point = 0)
+        {
+            if(user is not null)
+            {
+                var userDB = await _userService.GetUserAsync(user.Id, true);
+                userDB.TotalUniqueVouch += point;
+                await _userService.SaveAsync();
+                await ReplyAsync($"Đã cộng cho user {user.Username} {point} point vào Unique Vouch");
+            }
+            else
+            {
+                await ReplyAsync("Vui lòng thêm tham số user vào");
             }
         }
     }

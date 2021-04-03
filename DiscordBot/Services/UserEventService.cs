@@ -37,25 +37,89 @@ namespace DiscordBot.Services
             return Task.CompletedTask;
         }
 
-        private Task MessageReceivedAsync(SocketMessage msg)
+        private async Task MessageReceivedAsync(SocketMessage msg)
         {            
             if (msg.Channel.Id == 826709742332280862)
             {
                 if (msg.Content.StartsWith('<') && !msg.Content.Contains("everyone")) 
                 {
                     var mentionedUser = msg.MentionedUsers.FirstOrDefault();
-                    var author = msg.Author;
 
-                    if (author.Id != mentionedUser.Id && !mentionedUser.IsBot)
+                    if (msg.Author.Id != mentionedUser.Id && !mentionedUser.IsBot)
                     {
-                        _userLeagueVouchService.AddOrUpdateUserLeagueVouchAsync(msg.Author.Id,
-                                                                            "Ritual",
-                                                                            msg.MentionedUsers.FirstOrDefault().Id,
-                                                                            msg.Content);
+                        var result = await _userLeagueVouchService.AddOrUpdateUserLeagueVouchAsync(msg.Author.Id,
+                                                                                                      "Ritual",
+                                                                                                      mentionedUser.Id,
+                                                                                                      msg.Content);
+                        if (result.Item1)
+                        {
+                            var user = mentionedUser as IGuildUser;
+                            var guild = _discord.GetGuild(753991000715690085);
+                            switch (result.Item2)
+                            {
+                                case >= 20 and <50:
+                                    // Add role Transmutation
+                                    if (!user.RoleIds.ToList().Contains(827869613919305758))
+                                    {
+                                        await user.AddRoleAsync(guild.GetRole(827869613919305758));
+                                        var channel = await user.GetOrCreateDMChannelAsync();
+                                        await channel.SendMessageAsync($"Chúc mừng bạn đã được up lên rank {guild.GetRole(827869613919305758).Name}");
+                                    }
+                                    break;
+                                case >= 50 and <100:
+                                    // Add role Regal
+                                    if (!user.RoleIds.ToList().Contains(827869590162898994))
+                                    {
+                                        await user.AddRoleAsync(guild.GetRole(827869590162898994));
+                                        var channel = await user.GetOrCreateDMChannelAsync();
+                                        await channel.SendMessageAsync($"Chúc mừng bạn đã được up lên rank {guild.GetRole(827869590162898994).Name}");
+                                    }
+                                    break;
+                                case >= 100 and < 170:
+                                    // Add role Chaos
+                                    if (!user.RoleIds.ToList().Contains(827869597377495060))
+                                    {
+                                        await user.AddRoleAsync(guild.GetRole(827869597377495060));
+                                        var channel = await user.GetOrCreateDMChannelAsync();
+                                        await channel.SendMessageAsync($"Chúc mừng bạn đã được up lên rank {guild.GetRole(827869597377495060).Name}");
+                                    }
+                                    break;
+                                case >= 170 and < 250:
+                                    // Add role Exalted
+                                    if (!user.RoleIds.ToList().Contains(827870146826731581))
+                                    {
+                                        await user.AddRoleAsync(guild.GetRole(827870146826731581));
+                                        var channel = await user.GetOrCreateDMChannelAsync();
+                                        await channel.SendMessageAsync($"Chúc mừng bạn đã được up lên rank {guild.GetRole(827870146826731581).Name}");
+                                    }
+                                    break;
+                                case >= 250 and < 1000:
+                                    // Add role Awakener
+                                    if (!user.RoleIds.ToList().Contains(827870348439453706))
+                                    {
+                                        await user.AddRoleAsync(guild.GetRole(827870348439453706));
+                                        var channel = await user.GetOrCreateDMChannelAsync();
+                                        await channel.SendMessageAsync($"Chúc mừng bạn đã được up lên rank {guild.GetRole(827870348439453706).Name}");
+                                    }
+                                    break;
+                                case > 1000:
+                                    // Add role Mirror
+                                    if (!user.RoleIds.ToList().Contains(827870901499854888))
+                                    {
+                                        await user.AddRoleAsync(guild.GetRole(827870901499854888));
+                                        var channel = await user.GetOrCreateDMChannelAsync();
+                                        await channel.SendMessageAsync($"Chúc mừng bạn đã được up lên rank {guild.GetRole(827870901499854888).Name}");
+                                    }
+                                    break;
+                                default:
+                                    break;
+                            }
+
+                        }
                     }
                     else
                     {
-                        _discord.GetGuild(753991000715690085)
+                        await _discord.GetGuild(753991000715690085)
                                 .GetTextChannel(826709742332280862)
                                 .SendMessageAsync("Tính tự vote cho chính mình ? Hãy quên ý định đó đi =))\nBtw, cũng đừng vote cho bot");
                     }
@@ -65,16 +129,41 @@ namespace DiscordBot.Services
                 {
                     if (!msg.Author.IsBot)
                     {
-                        _discord.GetGuild(753991000715690085)
+                        await _discord.GetGuild(753991000715690085)
                                 .GetTextChannel(826709742332280862)
-                                .SendMessageAsync("Không spam ở đây");
-                        msg.DeleteAsync();
+                                .SendMessageAsync($"Không spam ở đây, {msg.Author.Username}");
+                        await msg.DeleteAsync();
                     }
                 }
             }
-                
-
-            return Task.CompletedTask;
+            if(msg.Channel.Id == 821742347199971368)
+            {
+                if (!msg.Author.IsBot)
+                {
+                    var mess = msg.Content.ToLower();
+                    if (!(mess.Contains("wtb") && (mess.Contains("rhc") || mess.Contains("rsc"))))
+                    {
+                        await msg.DeleteAsync();
+                        await _discord.GetGuild(753991000715690085)
+                                      .GetTextChannel(821742347199971368)
+                                      .SendMessageAsync($"{msg.Author.Username} đã đăng sai mẫu, vui lòng đăng như sau: `WTB RHC thứ cần mua`, thay RHC = RSC nếu mua ở RSC");
+                    }
+                }
+            }
+            if (msg.Channel.Id == 821743454152687626)
+            {
+                if (!msg.Author.IsBot)
+                {
+                    var mess = msg.Content.ToLower();
+                    if (!(mess.Contains("wts") && (mess.Contains("rhc") || mess.Contains("rsc"))))
+                    {
+                        await msg.DeleteAsync();
+                        await _discord.GetGuild(753991000715690085)
+                                      .GetTextChannel(821743454152687626)
+                                      .SendMessageAsync($"{msg.Author.Username} đã đăng sai mẫu, vui lòng đăng như sau: `WTS RHC thứ cần mua`, thay RHC = RSC nếu mua ở RSC");
+                    }
+                }
+            }
         }
 
         private async Task UserLeftAsync(SocketGuildUser user)
@@ -89,12 +178,12 @@ namespace DiscordBot.Services
 
         private async Task UserJoinedAsync(SocketGuildUser user)
         {
-            var userObject = new User { Id = user.Id, JoinedAt = DateTime.Now.ToLocalTime(), TotalVouch = 0 };
+            var userObject = new User { Id = user.Id, JoinedAt = DateTime.Now.ToLocalTime(), TotalVouch = 0, TotalUniqueVouch = 0 };
             _userService.CreateUser(userObject);
             await _userService.SaveAsync();
             _userService.DetachUser(userObject);
 
-            var role = (user as IGuildUser).Guild.Roles.FirstOrDefault(x => x.Id == 824311076350722119);
+            var role = (user as IGuildUser).Guild.Roles.FirstOrDefault(x => x.Id == 827869475880566815);
             await user.AddRoleAsync(role);
 
             var discord = _discord.GetGuild(753991000715690085).GetTextChannel(826112672943702027);

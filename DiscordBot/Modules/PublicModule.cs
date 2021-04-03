@@ -48,21 +48,23 @@ namespace DiscordBot.Modules
         public async Task UserInfoAsync(IUser user = null)
         {
             user ??= Context.User;
-            var userVouchInfo = await _userInformationService.GetUserInformationAsync(user.Id);
+            var userInfo = await _userInformationService.GetUserInformationAsync(user.Id);
             var roles = (user as SocketGuildUser).Roles.ToList();
-            string role;
-            if (roles[0].Name.Contains("everyone") && roles.Count == 1) role = "Newbie";
-            else role = roles[1].ToString();
+            SocketRole role;
+            if (roles[0].Name.Contains("everyone") && roles.Count == 1) role = roles[0];
+            else role = roles[1];
             EmbedBuilder embedBuilder = new();
-            embedBuilder.AddField(user.Username, user.Status);
-            embedBuilder.AddField("Acc đã tạo được ", (DateTime.Now.Date - user.CreatedAt.Date).ToString("dd") + " ngày");
-            embedBuilder.AddField("Đã tham gia vào group được", userVouchInfo.Joined + " ngày");
-            embedBuilder.AddField("Hiện đang", user.Activity is null ? "Không làm gì cả" : user.Activity);
-            embedBuilder.AddField("Cấp độ", role);
-            embedBuilder.AddField("Tổng lượt vouch", userVouchInfo.TotalVouch);
-            embedBuilder.AddField("Unique vouch trong league Ritual", userVouchInfo.UniqueVouch);
-            embedBuilder.AddField("Tổng unique vouch", userVouchInfo.LeagueUniqueVouch);
-            await ReplyAsync("", false, embedBuilder.Build());
+            embedBuilder.AddField("Đã tạo acc được", (DateTime.UtcNow.ToLocalTime() - user.CreatedAt.Date).ToString("dd") + " ngày", true)
+                        .AddField("Đã tham gia group được", userInfo.Joined + " ngày", true)
+                        .WithColor(role.Color)
+                        .WithTitle(user.Username)
+                        .WithDescription(user.Status.ToString())
+                        .AddField("Role cao nhất: ", role)
+                        .AddField("Tổng unique vouch", userInfo.UniqueVouch, true)
+                        .AddField("Tổng vouch", userInfo.TotalVouch, true)
+                        .AddField("Ritual League vouch",userInfo.LeagueUniqueVouch, true)
+                        .WithCurrentTimestamp();
+            await ReplyAsync(embed:embedBuilder.Build());
         }
 
         
@@ -81,6 +83,6 @@ namespace DiscordBot.Modules
             var afk = guild.Users.Where(x => x.Status == UserStatus.AFK).Count();
             var total = guild.Users.Count();
             await ReplyAsync($"Online: {online}\nOffline: {offline}\nAFK: {afk}\nDND: {dnd}\nIdle: {idle}\nInvisible: {invisible}\nTổng cộng: {total}");
-        }       
+        }
     }
 }

@@ -24,13 +24,12 @@ namespace Services
         {
             var user = await _repositoryManager.User.GetUserAsync(userId, false);
             var userLeagueVouch = await _repositoryManager.UserLeagueVouch.UserLeagueVouchAsync(userId, _repositoryManager.League.GetLeagueAsync(CurrentLeague, false).GetAwaiter().GetResult().LeagueId, false);
-            var userVouches = await _repositoryManager.UserLeagueVouch.GetUserVouchesAsync(userId, false);
 
             UserInformation vouchInformation = new()
             {
                 TotalVouch = user.TotalVouch,
                 LeagueUniqueVouch = userLeagueVouch.Vouch,
-                UniqueVouch = (uint)userVouches.Sum(x => x.Vouch),
+                UniqueVouch = user.TotalUniqueVouch,
                 Joined = (uint)(DateTime.UtcNow.ToLocalTime() - user.JoinedAt).Days
             };
 

@@ -9,7 +9,7 @@ using Models;
 namespace Models.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20210402160730_Initial")]
+    [Migration("20210403135203_Initial")]
     partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -41,6 +41,9 @@ namespace Models.Migrations
 
                     b.Property<DateTime>("JoinedAt")
                         .HasColumnType("datetime(6)");
+
+                    b.Property<uint>("TotalUniqueVouch")
+                        .HasColumnType("int unsigned");
 
                     b.Property<uint>("TotalVouch")
                         .HasColumnType("int unsigned");

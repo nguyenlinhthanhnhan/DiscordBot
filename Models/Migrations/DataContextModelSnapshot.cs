@@ -40,6 +40,9 @@ namespace Models.Migrations
                     b.Property<DateTime>("JoinedAt")
                         .HasColumnType("datetime(6)");
 
+                    b.Property<uint>("TotalUniqueVouch")
+                        .HasColumnType("int unsigned");
+
                     b.Property<uint>("TotalVouch")
                         .HasColumnType("int unsigned");
 

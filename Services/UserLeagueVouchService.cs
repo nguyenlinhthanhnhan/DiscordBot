@@ -20,8 +20,9 @@ namespace Services
 
         public Task SaveAsync() => _repositoryManager.SaveAsync();
 
-        public async Task AddOrUpdateUserLeagueVouchAsync(ulong userId, string leagueName, ulong userVote, string reason)
+        public async Task<Tuple<bool, uint>> AddOrUpdateUserLeagueVouchAsync(ulong userId, string leagueName, ulong userVote, string reason)
         {
+            var checkRole = false;
             var leagueId = _repositoryManager.League.GetLeagueAsync(leagueName, false).GetAwaiter().GetResult().LeagueId;
             var obj = FindByCondition(x => x.UserId == userVote && x.LeagueId.Equals(leagueId),
                                       false).Include(x=>x.VouchedUsers).SingleOrDefault();
@@ -56,6 +57,7 @@ namespace Services
                 _repositoryManager.UserLeagueVouch.CreateUserLeagueVouch(newUserLeagueVouch);
 
                 user.TotalVouch++;
+                user.TotalUniqueVouch++;
                 await _repositoryManager.SaveAsync();
             }
             else
@@ -71,9 +73,13 @@ namespace Services
                     _repositoryManager.VouchUser.CreateVouchedUser(new VouchUser { Id = Guid.NewGuid(), UserVouchId = userId, Reason = reason, UserLeagueVouchLeagueId = leagueId, UserLeagueVouchUserId = userVote });
                     var userVoted = await _repositoryManager.UserLeagueVouch.UserLeagueVouchAsync(userVote, leagueId, true);
                     userVoted.Vouch++;
+                    user.TotalUniqueVouch++;
                     await _repositoryManager.SaveAsync();
+                    checkRole = true;
                 }
             }
+
+            return Tuple.Create(checkRole, user.TotalUniqueVouch);
         }
     }
 }
